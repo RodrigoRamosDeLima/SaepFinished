@@ -5,7 +5,7 @@ function Card({ tarefa, buscarTarefas, usuarios }) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const alterarStatus = async (novoStatus) => {
-    await fetch(`http://localhost:3000/tarefas/${tarefa.id}`, {
+    await fetch(`http://localhost:3000/tarefa/${tarefa.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: novoStatus }),
@@ -14,7 +14,7 @@ function Card({ tarefa, buscarTarefas, usuarios }) {
   };
 
   const editarTarefa = async () => {
-    await fetch(`http://localhost:3000/tarefas/${tarefa.id}`, {
+    await fetch(`http://localhost:3000/tarefa/${tarefa.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(editedTarefa),
@@ -26,7 +26,7 @@ function Card({ tarefa, buscarTarefas, usuarios }) {
   const deletarTarefa = async () => {
     const confirmed = window.confirm('Tem certeza de que deseja deletar esta tarefa?');
     if (confirmed) {
-      await fetch(`http://localhost:3000/tarefas/${tarefa.id}`, { method: 'DELETE' });
+      await fetch(`http://localhost:3000/tarefa/${tarefa.id}`, { method: 'DELETE' });
       buscarTarefas();
     }
   };

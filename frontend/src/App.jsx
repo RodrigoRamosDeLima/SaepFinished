@@ -12,40 +12,38 @@ function App() {
     usuario_id: '',
   });
 
+  // URL do backend
+  const API_URL = "http://localhost:3000";
+
   // Função para buscar as tarefas
   const fetchTarefas = async () => {
     try {
-      const response = await fetch("http://localhost:3000/tarefas");
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setTarefas(data);
-      } else {
-        console.error("Erro ao buscar tarefas. Dados inválidos.");
-        setTarefas([]);  // Caso a resposta não seja um array válido
+      const response = await fetch(`${API_URL}/tarefa`);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar tarefas: ${response.status} - ${response.statusText}`);
       }
+      const data = await response.json();
+      setTarefas(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Erro ao buscar tarefas:", error);
-      setTarefas([]);  // Garantir que o estado seja um array vazio em caso de erro
+      console.error("Erro ao buscar tarefas:", error.message);
     }
   };
 
   // Função para buscar os usuários
   const fetchUsuarios = async () => {
     try {
-      const response = await fetch("http://localhost:3000/usuarios");
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setUsuarios(data);
-      } else {
-        console.error("Erro ao buscar usuários. Dados inválidos.");
-        setUsuarios([]);
+      const response = await fetch(`${API_URL}/usuario`);
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar usuários: ${response.status} - ${response.statusText}`);
       }
+      const data = await response.json();
+      setUsuarios(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      setUsuarios([]);  // Garantir que o estado seja um array vazio em caso de erro
+      console.error("Erro ao buscar usuários:", error.message);
     }
   };
 
+  // useEffect para carregar os dados na montagem do componente
   useEffect(() => {
     fetchTarefas();
     fetchUsuarios();
@@ -58,15 +56,18 @@ function App() {
       return;
     }
     try {
-      await fetch("http://localhost:3000/usuarios", {
+      const response = await fetch(`${API_URL}/usuario`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(novoUsuario),
       });
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar usuário.");
+      }
       setNovoUsuario({ nome: '', email: '' });
       fetchUsuarios();
     } catch (error) {
-      console.error("Erro ao cadastrar usuário:", error);
+      console.error("Erro ao cadastrar usuário:", error.message);
     }
   };
 
@@ -77,15 +78,18 @@ function App() {
       return;
     }
     try {
-      await fetch("http://localhost:3000/tarefas", {
+      const response = await fetch(`${API_URL}/tarefa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(novaTarefa),
       });
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar tarefa.");
+      }
       setNovaTarefa({ descricao: '', nome_setor: '', prioridade: 'baixa', usuario_id: '' });
       fetchTarefas();
     } catch (error) {
-      console.error("Erro ao cadastrar tarefa:", error);
+      console.error("Erro ao cadastrar tarefa:", error.message);
     }
   };
 
@@ -137,7 +141,7 @@ function App() {
           onChange={(e) => setNovaTarefa({ ...novaTarefa, usuario_id: e.target.value })}
         >
           <option value="">Selecione um usuário</option>
-          {Array.isArray(usuarios) && usuarios.map((usuario) => (
+          {usuarios.map((usuario) => (
             <option key={usuario.id} value={usuario.id}>
               {usuario.nome}
             </option>
@@ -150,7 +154,7 @@ function App() {
         {["a_fazer", "fazendo", "pronto"].map((status) => (
           <div key={status} className="coluna">
             <h2>{status.replace("_", " ").toUpperCase()}</h2>
-            {Array.isArray(tarefas) && tarefas
+            {tarefas
               .filter((tarefa) => tarefa.status === status)
               .map((tarefa) => (
                 <Card

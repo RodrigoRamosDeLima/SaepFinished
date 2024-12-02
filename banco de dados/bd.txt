@@ -1,0 +1,14 @@
+CREATE TABLE usuario (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE tarefa (
+  id SERIAL PRIMARY KEY,
+  descricao TEXT NOT NULL,
+  nome_setor VARCHAR(50) NOT NULL,
+  prioridade VARCHAR(10) NOT NULL,
+  status VARCHAR(20) DEFAULT 'a_fazer',
+  usuario_id INTEGER REFERENCES usuario(id)
+);
